@@ -1,0 +1,39 @@
+using System;
+
+
+namespace Observer
+{
+    public class TemperatureReporter : IObserver
+    {
+        private bool first;
+        private Temperature last;
+        private IObservable provider;
+
+        public void StartReporting(IObservable provider)
+        {
+            this.provider = provider;
+            this.first = true;
+            this.provider.AddObserver(this);
+        }
+
+        public void StopReporting()
+        {
+            this.provider.Unsubscribe(this);
+        }
+
+        public void Update()
+        {
+            Console.WriteLine($"The temperature is {this.provider.Current.Degrees}°C at {this.provider.Current.Date:g}");
+            if (first)
+            {
+                last = this.provider.Current;
+                first = false;
+            }
+            else
+            {
+                Console.WriteLine($"   Change: {this.provider.Current.Degrees - last.Degrees}° in " +
+                    $"{this.provider.Current.Date.ToUniversalTime() - last.Date.ToUniversalTime():g}");
+            }
+        }
+    }
+}
